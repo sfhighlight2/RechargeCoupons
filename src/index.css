@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Anton", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-grotesk: "Space Grotesk", sans-serif;
+  
+  --color-brand-orange: #BE0101;
+  --color-brand-green: #940101;
+  --color-brand-cream: #F9F7F2;
+  --color-brand-black: #1A1A1A;
+}
+
+body {
+  background-color: var(--color-brand-cream);
+  color: var(--color-brand-black);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F9F7F2;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #BE0101;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #940101;
+}
+
+/* Selection Color */
+::selection {
+  background: #BE0101;
+  color: white;
+}
