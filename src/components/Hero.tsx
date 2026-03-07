@@ -12,6 +12,7 @@ export default function Hero() {
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const offer = searchParams.get('offer');
@@ -40,7 +41,7 @@ export default function Hero() {
     setPhone(formatted);
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     // Basic validation
@@ -55,8 +56,29 @@ export default function Hero() {
       return;
     }
 
-    // In a real app, we would submit the data here
-    navigate('/thank-you', { state: { firstName } });
+    setIsSubmitting(true);
+
+    try {
+      await fetch('https://services.leadconnectorhq.com/hooks/4PrBtcQb8wpAnA2gK9AJ/webhook-trigger/e64277fd-d5be-472c-8144-38fc1dd6f7ec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          phone,
+          offer: offerTitle
+        }),
+      });
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      // Even if webhook fails, we still want to redirect the user to claim the offer
+    } finally {
+      setIsSubmitting(false);
+      navigate('/thank-you', { state: { firstName } });
+    }
   };
 
   return (
@@ -204,9 +226,10 @@ export default function Hero() {
 
               <button
                 type="submit"
-                className="w-full bg-[#BE0101] text-white font-bold py-4 rounded-xl shadow-lg hover:bg-[#940101] hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 uppercase tracking-wider text-lg mt-4"
+                disabled={isSubmitting}
+                className={`w-full text-white font-bold py-4 rounded-xl shadow-lg transform transition-all duration-200 uppercase tracking-wider text-lg mt-4 ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#BE0101] hover:bg-[#940101] hover:shadow-xl hover:-translate-y-1'}`}
               >
-                Claim Offer
+                {isSubmitting ? 'Claiming...' : 'Claim Offer'}
               </button>
 
               <p className="text-[10px] text-gray-400 text-center leading-tight mt-4">
