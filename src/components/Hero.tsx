@@ -3,11 +3,19 @@ import { Star, Phone, MapPin } from 'lucide-react';
 import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
-export default function Hero() {
+interface HeroProps {
+  defaultOfferTitle?: string;
+  defaultHeroTitle?: string;
+}
+
+export default function Hero({
+  defaultOfferTitle = 'Claim Your 50% Smoothie Coupon',
+  defaultHeroTitle = '50% OFF ANY SMOOTHIE'
+}: HeroProps = {}) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [offerTitle, setOfferTitle] = useState('Claim Your 50% Smoothie Coupon');
-  const [heroTitle, setHeroTitle] = useState('50% OFF ANY SMOOTHIE');
+  const [offerTitle, setOfferTitle] = useState(defaultOfferTitle);
+  const [heroTitle, setHeroTitle] = useState(defaultHeroTitle);
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');

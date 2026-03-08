@@ -26,10 +26,16 @@ function ScrollToTop() {
   return null;
 }
 
-function HomePage() {
+function HomePage({
+  defaultOfferTitle,
+  defaultHeroTitle
+}: {
+  defaultOfferTitle?: string;
+  defaultHeroTitle?: string;
+} = {}) {
   return (
     <>
-      <Hero />
+      <Hero defaultOfferTitle={defaultOfferTitle} defaultHeroTitle={defaultHeroTitle} />
       <HowItWorks />
       <MenuSection />
       <Features />
@@ -64,10 +70,19 @@ export default function App() {
           <TopBar />
           <Navbar />
         </div>
-        
+
         <main className="relative z-10">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route
+              path="/bogo"
+              element={
+                <HomePage
+                  defaultOfferTitle="Claim Your Free BOGO Smoothie"
+                  defaultHeroTitle="BUY 1 GET 1 FREE SMOOTHIE"
+                />
+              }
+            />
             <Route path="/thank-you" element={<ThankYouPage />} />
           </Routes>
         </main>
