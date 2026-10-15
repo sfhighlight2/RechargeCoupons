@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion } from 'motion/react';
 import { CUP_IMAGES, MENU, type Offer } from '../config';
+import { RevealText } from './motion/Reveal';
 
 const ITEMS = MENU.flatMap((group) => group.items.map((item) => ({ ...item, category: group.category })));
 const FIRST_INDEX = Object.fromEntries(MENU.map((g) => [g.category, ITEMS.findIndex((i) => i.category === g.category)]));
@@ -58,8 +60,8 @@ export default function Favorites({ offer }: { offer: Offer }) {
         <div className="flex items-end justify-between gap-6">
           <div>
             <h2 id="fav-title" className="text-4xl uppercase sm:text-5xl">
-              Pick your favorite
-            </h2>
+            <RevealText>Pick your favorite</RevealText>
+          </h2>
             <p className="mt-3 max-w-[48ch] text-[17px] leading-relaxed text-ink-700">
               24 smoothies made with real fruit, blended when you order. Your coupon works on any of them.
             </p>
@@ -98,12 +100,16 @@ export default function Favorites({ offer }: { offer: Offer }) {
           aria-label="Smoothie menu"
           className="no-scrollbar -mx-4 mt-6 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pt-1 pb-4 sm:mx-0 sm:scroll-px-0 sm:gap-4 sm:px-0"
         >
-          {ITEMS.map((item) => {
+          {ITEMS.map((item, i) => {
             const img = CUP_IMAGES[item.cup];
             return (
-              <li
+              <motion.li
                 key={item.name}
-                className="flex w-[44%] shrink-0 snap-start flex-col rounded-[var(--radius-card)] bg-white pt-5 pb-5 shadow-[var(--shadow-card)] sm:w-[30%] md:w-[23%] lg:w-[calc((100%-4rem)/5)]"
+                initial={{ opacity: 0, y: 28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.35 }}
+                transition={{ duration: 0.6, delay: (i % 5) * 0.06, ease: [0.16, 1, 0.3, 1] }}
+                className="group flex w-[44%] shrink-0 snap-start flex-col rounded-[var(--radius-card)] bg-white pt-5 pb-5 shadow-[var(--shadow-card)] sm:w-[30%] md:w-[23%] lg:w-[calc((100%-4rem)/5)]"
               >
                 <img
                   src={img.src}
@@ -112,13 +118,13 @@ export default function Favorites({ offer }: { offer: Offer }) {
                   height={img.h}
                   loading="lazy"
                   decoding="async"
-                  className="mx-auto h-[150px] w-auto object-contain lg:h-[170px]"
+                  className="mx-auto h-[150px] w-auto object-contain transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:-translate-y-2 group-hover:-rotate-3 lg:h-[170px]"
                 />
                 <div className="px-4 pt-3">
                   <h3 className="text-[16px] leading-tight font-semibold">{item.name}</h3>
                   <p className="mt-1 text-[13px] leading-snug text-ink-500">{item.ingredients}</p>
                 </div>
-              </li>
+              </motion.li>
             );
           })}
         </ul>

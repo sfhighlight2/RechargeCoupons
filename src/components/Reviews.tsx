@@ -1,6 +1,7 @@
 import { ArrowUpRight, Star } from 'lucide-react';
 import { motion } from 'motion/react';
 import { BUSINESS } from '../config';
+import { RevealText } from './motion/Reveal';
 
 // Verbatim from Recharge Smoothies Cafe's Google Business Profile (5 stars, Oct 2026).
 // Only quote real reviews by real customers. Never the owner, staff, or invented ones.
@@ -31,7 +32,7 @@ export default function Reviews() {
 
         <div className="order-1 md:order-2">
           <h2 id="reviews-title" className="text-4xl uppercase sm:text-5xl">
-            Sunrise keeps coming back
+            <RevealText>Sunrise keeps coming back</RevealText>
           </h2>
           <figure className="mt-8">
             <div className="flex text-orange-500" aria-label="5 out of 5 stars">

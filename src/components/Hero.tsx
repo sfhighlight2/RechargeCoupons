@@ -1,4 +1,6 @@
+import { useRef } from 'react';
 import { Check, Star } from 'lucide-react';
+import HeroFruit from './motion/HeroFruit';
 import { HERO_RATING_CLAIM, type Offer } from '../config';
 import LeadForm from './LeadForm';
 
@@ -25,15 +27,18 @@ function Headline({ offer }: { offer: Offer }) {
 }
 
 export default function Hero({ offer }: { offer: Offer }) {
+  const ref = useRef<HTMLElement>(null);
   return (
-    <section id="top" className="relative overflow-hidden pt-5 pb-14 sm:pt-10 lg:pt-14 lg:pb-24">
+    <section ref={ref} id="top" className="relative overflow-hidden pt-5 pb-14 sm:pt-10 lg:pt-14 lg:pb-24">
       {/* Citrus warmth behind the product, from the logo's yellow-to-red sweep */}
       <div
         aria-hidden
         className="pointer-events-none absolute -top-40 -right-40 size-[38rem] rounded-full bg-[radial-gradient(closest-side,rgba(255,217,61,0.35),rgba(247,148,29,0.12)_55%,transparent)] lg:-right-20 lg:top-0 lg:size-[52rem]"
       />
 
-      <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-7 px-4 sm:px-6 lg:grid-cols-2 lg:items-stretch lg:gap-12 lg:px-8">
+      <HeroFruit target={ref} />
+
+      <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 gap-7 px-4 sm:px-6 lg:grid-cols-2 lg:items-stretch lg:gap-12 lg:px-8">
         <div className="flex flex-col gap-2.5 sm:gap-4 lg:justify-center lg:gap-10">
           <div className="flex flex-col gap-2.5 sm:gap-4 lg:gap-6">
           <p className="flex items-center justify-center gap-2 text-[13px] font-semibold text-ink-700 lg:justify-start">

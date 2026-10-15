@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import type { Offer } from '../config';
+import { RevealText } from './motion/Reveal';
 
 export default function HowItWorks({ offer }: { offer: Offer }) {
   const steps = [
@@ -12,8 +13,8 @@ export default function HowItWorks({ offer }: { offer: Offer }) {
     <section aria-labelledby="how-title" className="bg-[linear-gradient(135deg,var(--color-red-600),var(--color-red-800))] text-white">
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
         <h2 id="how-title" className="text-4xl uppercase sm:text-5xl">
-          Three steps to your smoothie
-        </h2>
+            <RevealText>Three steps to your smoothie</RevealText>
+          </h2>
         <ol className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6">
           {steps.map((step, i) => (
             <motion.li

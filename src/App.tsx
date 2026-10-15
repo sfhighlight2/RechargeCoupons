@@ -8,6 +8,8 @@ import Hero from './components/Hero';
 import HowItWorks from './components/HowItWorks';
 import Favorites from './components/Favorites';
 import Features from './components/Features';
+import FruitRibbon from './components/motion/FruitRibbon';
+import BlendStory from './components/motion/BlendStory';
 import Reviews from './components/Reviews';
 import Visit from './components/Visit';
 import FAQ from './components/FAQ';
@@ -62,7 +64,9 @@ function LandingPage({ base }: { base: Offer }) {
       <SiteHeader homePath={base.path} />
       <main>
         <Hero offer={offer} />
+        <FruitRibbon />
         <HowItWorks offer={offer} />
+        <BlendStory offer={offer} />
         <Favorites offer={offer} />
         <Features />
         <Reviews />

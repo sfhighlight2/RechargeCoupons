@@ -1,5 +1,6 @@
 import { Plus } from 'lucide-react';
 import { BUSINESS, COUPON_VALID_DAYS } from '../config';
+import { RevealText } from './motion/Reveal';
 
 const faqs = [
   {
@@ -29,8 +30,8 @@ export default function FAQ() {
     <section aria-labelledby="faq-title" className="py-16 lg:py-24">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <h2 id="faq-title" className="text-4xl uppercase sm:text-5xl">
-          Good to know
-        </h2>
+            <RevealText>Good to know</RevealText>
+          </h2>
         <div className="mt-8 divide-y divide-ink-900/10 border-y border-ink-900/10">
           {faqs.map((f) => (
             <details key={f.q} className="group">

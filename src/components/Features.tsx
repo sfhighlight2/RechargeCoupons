@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { Heart, Leaf, SlidersHorizontal } from 'lucide-react';
+import { RevealText } from './motion/Reveal';
 
 const features = [
   {
@@ -29,9 +30,9 @@ export default function Features() {
         <div className="text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-red-600">Why choose Recharge?</p>
           <h2 id="why-title" className="mt-2 text-4xl uppercase sm:text-5xl">
-            Blended with love,
+            <RevealText>Blended with love,
             <br />
-            served with joy.
+            served with joy.</RevealText>
           </h2>
         </div>
 

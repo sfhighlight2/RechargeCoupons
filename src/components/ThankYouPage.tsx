@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Check, Clock, MapPin, MessageCircle, Navigation, Phone, Share2 } from 'lucide-react';
 import { BUSINESS, COUPON_VALID_DAYS, OFFER_TERMS, OFFERS } from '../config';
+import FruitRain from './motion/FruitRain';
 
 interface ThankYouState {
   firstName?: string;
@@ -77,6 +78,7 @@ export default function ThankYouPage() {
 
   return (
     <section className="relative overflow-hidden pt-6 pb-20 sm:pt-10">
+      <FruitRain />
       <div
         aria-hidden
         className="pointer-events-none absolute -top-40 left-1/2 size-[44rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(255,217,61,0.35),rgba(247,148,29,0.1)_55%,transparent)]"

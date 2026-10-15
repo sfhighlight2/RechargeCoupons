@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { ArrowRight, Clock, MapPin, Phone } from 'lucide-react';
 import { BUSINESS } from '../config';
+import { RevealText } from './motion/Reveal';
 
 const MAP_EMBED =
   'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3581.526662095697!2d-80.2583704!3d26.1520731!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d906391e0767a5%3A0x9f88449ffabe3c26!2s2101%20N%20University%20Dr%20Ste%20B%2C%20Sunrise%2C%20FL%2033322!5e0!3m2!1sen!2sus!4v1709845678901!5m2!1sen!2sus';
@@ -26,7 +27,7 @@ export default function Visit() {
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-red-600">Visit us</p>
           <h2 id="visit-title" className="mt-2 text-4xl uppercase sm:text-5xl">
-            Find your Recharge.
+            <RevealText>Find your Recharge.</RevealText>
           </h2>
           <p className="mt-5 max-w-[42ch] text-lg leading-relaxed text-ink-700">
             We're located in the heart of Sunrise, FL. Stop by for a quick pick-me-up or a healthy meal.
