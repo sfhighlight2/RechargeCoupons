@@ -14,13 +14,13 @@ const MIN_TIME_ON_PAGE_MS = 8000;
 
 /** True once the visitor has typed into the coupon form. */
 function formStarted() {
-  return [...document.querySelectorAll<HTMLInputElement>('#claim input:not([name="company"])')].some((i) => i.value.trim());
+  return [...document.querySelectorAll<HTMLInputElement>('#claim input:not([name="rc_hp_check"])')].some((i) => i.value.trim());
 }
 
 function focusForm() {
   const form = document.getElementById('claim');
   form?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  const firstEmpty = [...document.querySelectorAll<HTMLInputElement>('#claim input:not([name="company"])')].find((i) => !i.value.trim());
+  const firstEmpty = [...document.querySelectorAll<HTMLInputElement>('#claim input:not([name="rc_hp_check"])')].find((i) => !i.value.trim());
   // Focus after the scroll settles so mobile keyboards don't fight the scroll.
   window.setTimeout(() => firstEmpty?.focus({ preventScroll: true }), 450);
 }

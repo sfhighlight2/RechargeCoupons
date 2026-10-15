@@ -103,8 +103,9 @@ export default function LeadForm({ offer }: { offer: Offer }) {
       return;
     }
 
-    // Honeypot: real visitors never see or fill this field.
-    const trap = (e.currentTarget.elements.namedItem('company') as HTMLInputElement | null)?.value;
+    // Spam check. Never block on it: browser autofill can fill hidden fields, and a dropped real
+    // lead is far worse than a tagged bot. Filled values are flagged for filtering in GHL instead.
+    const trap = (e.currentTarget.elements.namedItem('rc_hp_check') as HTMLInputElement | null)?.value?.trim();
 
     inFlight.current = true;
     setStatus('sending');
@@ -128,17 +129,16 @@ export default function LeadForm({ offer }: { offer: Offer }) {
       page_url: window.location.href,
       user_agent: navigator.userAgent,
       exit_popup_seen: exitShownThisSession() ? 'yes' : 'no',
+      possible_bot: trap ? 'yes' : 'no',
       ...attributionFields(),
     };
 
-    let ok = true;
-    if (!trap) {
+    let ok = await postLead(payload);
+    if (!ok) {
+      await new Promise((r) => setTimeout(r, 900));
       ok = await postLead(payload);
-      if (!ok) {
-        await new Promise((r) => setTimeout(r, 900));
-        ok = await postLead(payload);
-      }
     }
+    console.info('[recharge] lead submit', ok ? 'accepted by GHL' : 'FAILED', { event_id: eventId, possible_bot: Boolean(trap) });
 
     inFlight.current = false;
     if (!ok) {
@@ -146,7 +146,7 @@ export default function LeadForm({ offer }: { offer: Offer }) {
       return;
     }
     markConverted();
-    if (!trap) trackLead(eventId, offer.key);
+    trackLead(eventId, offer.key);
     navigate('/thank-you', {
       state: { firstName: payload.firstName, offerKey: offer.key, couponName: offer.couponName, from: window.location.pathname + window.location.search },
     });
@@ -215,9 +215,9 @@ export default function LeadForm({ offer }: { offer: Offer }) {
         enterKeyHint: 'send',
       })}
 
-      <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
-        <label htmlFor="company">Company</label>
-        <input id="company" name="company" type="text" tabIndex={-1} autoComplete="off" />
+      <div aria-hidden hidden>
+        <label htmlFor="rc_hp_check">Leave this empty</label>
+        <input id="rc_hp_check" name="rc_hp_check" type="text" tabIndex={-1} autoComplete="off" data-1p-ignore data-lpignore="true" />
       </div>
 
       <p className="text-xs leading-relaxed text-ink-500">
