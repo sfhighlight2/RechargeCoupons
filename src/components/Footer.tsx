@@ -1,24 +1,34 @@
-import { Heart } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { BUSINESS } from '../config';
 
-export default function Footer() {
+export default function Footer({ padForStickyBar = false }: { padForStickyBar?: boolean }) {
   return (
-    <footer className="bg-black text-white py-12">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-12">
-          <div className="text-center md:text-left mb-8 md:mb-0">
-            <img src="/logo.png" alt="Recharge Smoothies Cafe" className="h-20 w-auto mb-4 mx-auto md:mx-0 drop-shadow-lg" />
-            <p className="text-gray-400 text-lg max-w-md mx-auto md:mx-0">
-              Blended with love, served with joy.
-            </p>
-          </div>
+    <footer className={`bg-ink-900 text-white/80 ${padForStickyBar ? 'pb-24 lg:pb-0' : ''}`}>
+      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-12 sm:px-6 md:flex-row md:items-start md:justify-between lg:px-8">
+        <div>
+          <img src="/img/logo.webp" alt="Recharge Smoothies Cafe" width={480} height={270} loading="lazy" className="h-14 w-auto" />
+          <p className="mt-4 text-[15px]">Blended with love, served with joy.</p>
         </div>
-
-        <div className="pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
-          <p>&copy; {new Date().getFullYear()} Recharge Smoothies Cafe. All rights reserved.</p>
-          <p className="mt-4 md:mt-0 flex items-center">
-            Made with <Heart className="w-3 h-3 text-red-500 mx-1 fill-current" /> in Sunrise, FL
-          </p>
-        </div>
+        <address className="text-[15px] not-italic leading-relaxed">
+          {BUSINESS.street}
+          <br />
+          {BUSINESS.cityLine}
+          <br />
+          <a href={BUSINESS.phoneHref} className="underline decoration-white/30 underline-offset-4 hover:text-white">
+            {BUSINESS.phoneDisplay}
+          </a>
+        </address>
+      </div>
+      <div className="mx-auto flex max-w-6xl flex-col gap-3 border-t border-white/10 px-4 py-6 text-[13px] text-white/60 sm:flex-row sm:justify-between sm:px-6 lg:px-8">
+        <p>&copy; {new Date().getFullYear()} {BUSINESS.name}. All rights reserved.</p>
+        <nav aria-label="Legal" className="flex gap-5">
+          <Link to="/privacy" className="hover:text-white">
+            Privacy Policy
+          </Link>
+          <Link to="/terms" className="hover:text-white">
+            SMS Terms
+          </Link>
+        </nav>
       </div>
     </footer>
   );

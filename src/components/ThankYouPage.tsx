@@ -1,138 +1,185 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { CheckCircle, MapPin, Phone, Clock, FileText, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
+import { Check, Clock, MapPin, MessageCircle, Navigation, Phone, Share2 } from 'lucide-react';
+import { BUSINESS, COUPON_VALID_DAYS, OFFER_TERMS, OFFERS } from '../config';
 
-export default function ThankYouPage() {
-  const location = useLocation();
-  const firstName = location.state?.firstName;
+interface ThankYouState {
+  firstName?: string;
+  offerKey?: string;
+  couponName?: string;
+  from?: string;
+}
+
+function expiryDate() {
+  const d = new Date();
+  d.setDate(d.getDate() + COUPON_VALID_DAYS);
+  return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+}
+
+function ShareButton({ path, text }: { path: string; text: string }) {
+  const [copied, setCopied] = useState(false);
+  const url = `${window.location.origin}${path}`;
+
+  const share = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ text, url });
+      } catch {
+        // Visitor closed the share sheet.
+      }
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      window.location.href = `sms:?&body=${encodeURIComponent(`${text} ${url}`)}`;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#F9F7F2] pt-32 pb-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+    <button
+      type="button"
+      onClick={share}
+      className="inline-flex h-12 items-center justify-center gap-2 rounded-full border-2 border-ink-900 px-6 font-semibold text-ink-900 transition-colors hover:bg-ink-900 hover:text-white"
+    >
+      {copied ? <Check aria-hidden className="size-4" /> : <Share2 aria-hidden className="size-4" />}
+      <span aria-live="polite">{copied ? 'Link copied' : 'Share with a friend'}</span>
+    </button>
+  );
+}
+
+export default function ThankYouPage() {
+  const state = (useLocation().state ?? {}) as ThankYouState;
+  const claimed = Boolean(state.offerKey);
+  const offer = Object.values(OFFERS).find((o) => state.offerKey?.startsWith(o.key)) ?? OFFERS.half;
+  const couponName = state.couponName ?? offer.couponName;
+  const sharePath = state.from && state.from.startsWith('/') ? state.from : offer.path;
+
+  if (!claimed) {
+    return (
+      <section className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-6">
+        <h1 className="text-5xl uppercase sm:text-6xl">Looking for your coupon?</h1>
+        <p className="mx-auto mt-4 max-w-[40ch] text-lg text-ink-700">
+          If you already signed up, check your texts and email for it. If not, it only takes a few seconds.
+        </p>
+        <Link
+          to={OFFERS.half.path}
+          className="mt-8 inline-flex h-14 items-center rounded-full bg-red-600 px-8 text-[17px] font-semibold text-white shadow-[var(--shadow-cta)] hover:bg-red-700"
         >
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
-            <CheckCircle className="w-10 h-10 text-green-600" />
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black text-[#1A1A1A] mb-4 tracking-tight uppercase">
-            {firstName ? `${firstName}, You're In!` : "You're In!"}
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Thanks for signing up! Your deal is on its way to your inbox.
-            Come visit us to redeem it!
-          </p>
+          Get my coupon
+        </Link>
+      </section>
+    );
+  }
+
+  return (
+    <section className="relative overflow-hidden pt-6 pb-20 sm:pt-10">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-40 left-1/2 size-[44rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(255,217,61,0.35),rgba(247,148,29,0.1)_55%,transparent)]"
+      />
+      <div className="relative mx-auto max-w-2xl px-4 sm:px-6">
+        <motion.div
+          initial={{ scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 18 }}
+          className="mx-auto flex size-16 items-center justify-center rounded-full bg-green-600 text-white shadow-[var(--shadow-card)]"
+        >
+          <Check aria-hidden className="size-8" strokeWidth={3} />
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-          {/* Info Card */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-[2rem] shadow-xl border border-black/5 p-8"
+        <h1 className="mt-6 text-center text-5xl uppercase sm:text-6xl">
+          {state.firstName ? `${state.firstName}, you're in` : "You're in"}
+        </h1>
+        <p className="mx-auto mt-3 max-w-[42ch] text-center text-lg leading-relaxed text-ink-700">
+          Your coupon is on its way. Watch for a text or email from Recharge Smoothies in the next few minutes.
+        </p>
+
+        {/* Coupon summary */}
+        <motion.div
+          initial={{ y: 24, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          className="relative mt-10 overflow-hidden rounded-[var(--radius-card)] bg-white shadow-[var(--shadow-lift)]"
+        >
+          <div className="bg-[linear-gradient(135deg,var(--color-red-600),var(--color-red-800))] px-6 py-6 text-white sm:px-8">
+            <p className="text-sm font-semibold text-white/80">Your coupon</p>
+            <p className="mt-1 font-display text-4xl uppercase leading-none sm:text-5xl">{couponName}</p>
+          </div>
+          {/* Ticket perforation */}
+          <div aria-hidden className="relative h-0">
+            <span className="absolute -top-3 -left-3 size-6 rounded-full bg-cream-50" />
+            <span className="absolute -top-3 -right-3 size-6 rounded-full bg-cream-50" />
+          </div>
+          <div className="flex flex-col gap-4 px-6 py-6 sm:px-8">
+            <p className="flex items-center gap-3 text-[17px] font-semibold">
+              <Clock aria-hidden className="size-5 text-red-600" />
+              Use it by {expiryDate()}
+            </p>
+            <p className="flex items-start gap-3 text-[16px] leading-relaxed text-ink-700">
+              <MessageCircle aria-hidden className="mt-0.5 size-5 shrink-0 text-red-600" />
+              Show the coupon we send you at the counter when you order.
+            </p>
+            <p className="border-t border-dashed border-ink-900/15 pt-4 text-[13px] leading-snug text-ink-500">{OFFER_TERMS}</p>
+          </div>
+        </motion.div>
+
+        <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <a
+            href={BUSINESS.mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-red-600 px-6 text-[17px] font-semibold text-white shadow-[var(--shadow-cta)] transition-colors hover:bg-red-700"
           >
-            <h2 className="text-2xl font-black text-[#1A1A1A] mb-6 uppercase tracking-tight">
-              Visit Us
-            </h2>
-
-            <div className="space-y-6">
-              <div className="flex items-start space-x-4">
-                <div className="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-[#BE0101]" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900">Location</h4>
-                  <p className="text-gray-600">2101 North University Dr. Suite B<br />Sunrise, FL 33322</p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Clock className="w-5 h-5 text-[#940101]" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900">Hours</h4>
-                  <ul className="text-gray-600 text-sm space-y-1">
-                    <li className="flex justify-between w-40"><span>Mon – Fri:</span> <span>9am – 9pm</span></li>
-                    <li className="flex justify-between w-40"><span>Saturday:</span> <span>9am – 7pm</span></li>
-                    <li className="flex justify-between w-40"><span>Sunday:</span> <span>10am – 6pm</span></li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900">Contact</h4>
-                  <p className="text-gray-600"><a href="tel:9549990332" className="hover:text-[#BE0101]">(954) 999-0332</a></p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <a
-                href="tel:9549990332"
-                className="flex items-center justify-center px-6 py-3 bg-[#1A1A1A] text-white font-bold rounded-xl hover:bg-black transition-colors"
-              >
-                <Phone className="w-4 h-4 mr-2" />
-                Call Now
-              </a>
-              <a
-                href="https://google.com/maps/place/recharge+smoothies/data=!4m2!3m1!1s0x88d906391e0767a5:0x9f88449ffabe3c26?sa=X&ved=1t:242&ictx=111"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center px-6 py-3 bg-[#BE0101] text-white font-bold rounded-xl hover:bg-[#940101] transition-colors"
-              >
-                <MapPin className="w-4 h-4 mr-2" />
-                Get Directions
-              </a>
-            </div>
-
-            <div className="mt-4">
-              <a
-                href="https://order.online/store/recharge-smoothies-cafe-sunrise-337075/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center w-full px-6 py-3 bg-white border-2 border-[#BE0101] text-[#BE0101] font-bold rounded-xl hover:bg-[#BE0101] hover:text-white transition-colors"
-              >
-                <FileText className="w-4 h-4 mr-2" />
-                View Our Menu
-              </a>
-            </div>
-          </motion.div>
-
-          {/* Map Card */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-            className="h-full min-h-[400px] bg-[#1A1A1A] rounded-[2rem] overflow-hidden shadow-xl border border-black/5"
+            <Navigation aria-hidden className="size-5" />
+            Get directions
+          </a>
+          <a
+            href={BUSINESS.phoneHref}
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-ink-900 px-6 text-[17px] font-semibold text-white transition-colors hover:bg-ink-700"
           >
-            <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3581.526662095697!2d-80.2583704!3d26.1520731!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d906391e0767a5%3A0x9f88449ffabe3c26!2s2101%20N%20University%20Dr%20Ste%20B%2C%20Sunrise%2C%20FL%2033322!5e0!3m2!1sen!2sus!4v1709845678901!5m2!1sen!2sus"
-              width="100%"
-              height="100%"
-              style={{ border: 0, minHeight: '400px' }}
-              allowFullScreen={true}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Recharge Smoothies Cafe Location"
-            ></iframe>
-          </motion.div>
+            <Phone aria-hidden className="size-5" />
+            Call {BUSINESS.phoneDisplay}
+          </a>
         </div>
 
-        <div className="mt-12 text-center">
-          <Link to="/" className="text-gray-500 hover:text-[#BE0101] font-bold inline-flex items-center transition-colors">
-            <ArrowRight className="w-4 h-4 mr-1 rotate-180" />
-            Back to Home
-          </Link>
+        <div className="mt-12 grid grid-cols-1 items-center gap-8 rounded-[var(--radius-card)] bg-white p-6 shadow-[var(--shadow-card)] sm:grid-cols-[1fr_auto] sm:p-8">
+          <div>
+            <h2 className="text-3xl uppercase">Bring a friend</h2>
+            <p className="mt-2 max-w-[36ch] text-[16px] leading-relaxed text-ink-700">
+              Send them the link so they can claim their own coupon and come with you.
+            </p>
+            <div className="mt-5">
+              <ShareButton path={sharePath} text={offer.shareText} />
+            </div>
+          </div>
+          <img
+            src="/img/lifestyle-berry.webp"
+            alt="Guest holding a berry smoothie in a Recharge cup"
+            width={521}
+            height={1100}
+            loading="lazy"
+            className="mx-auto hidden h-56 w-40 rounded-[18px] object-cover object-[50%_35%] sm:block"
+          />
+        </div>
+
+        <div className="mt-12 flex flex-col gap-2 text-center text-[15px] text-ink-700">
+          <p className="flex items-center justify-center gap-2">
+            <MapPin aria-hidden className="size-4 text-red-600" />
+            {BUSINESS.street}, {BUSINESS.cityLine}
+          </p>
+          <ul className="tabular">
+            {BUSINESS.hours.map((h) => (
+              <li key={h.days}>
+                <span className="text-ink-500">{h.days}</span> {h.time}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -1,255 +1,96 @@
-import { motion } from 'motion/react';
-import { Star, Phone, MapPin } from 'lucide-react';
-import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Check, Star } from 'lucide-react';
+import { HERO_RATING_CLAIM, type Offer } from '../config';
+import LeadForm from './LeadForm';
 
-interface HeroProps {
-  defaultOfferTitle?: string;
-  defaultHeroTitle?: string;
+function Headline({ offer }: { offer: Offer }) {
+  const long = offer.headline.length > 22;
+  const size = long
+    ? 'text-[clamp(2.9rem,13.5vw,3.6rem)] leading-[0.95] sm:text-6xl lg:text-[4.4rem]'
+    : 'text-[clamp(3.4rem,16vw,4.4rem)] leading-[0.92] sm:text-7xl lg:text-[5.6rem]';
+  const { headline, highlight } = offer;
+  const at = highlight ? headline.indexOf(highlight) : -1;
+  return (
+    <h1 className={`text-center uppercase text-ink-900 lg:text-left ${size}`}>
+      {at >= 0 ? (
+        <>
+          {headline.slice(0, at)}
+          <span className="whitespace-nowrap text-red-600">{highlight}</span>
+          {headline.slice(at + highlight!.length)}
+        </>
+      ) : (
+        headline
+      )}
+    </h1>
+  );
 }
 
-export default function Hero({
-  defaultOfferTitle = 'Claim Your 50% Smoothie Coupon',
-  defaultHeroTitle = '50% OFF ANY SMOOTHIE'
-}: HeroProps = {}) {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const [offerTitle, setOfferTitle] = useState(defaultOfferTitle);
-  const [heroTitle, setHeroTitle] = useState(defaultHeroTitle);
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    const offer = searchParams.get('offer');
-    const title = searchParams.get('title');
-
-    if (offer) {
-      setOfferTitle(offer);
-    }
-    if (title) {
-      setHeroTitle(title);
-    }
-  }, [searchParams]);
-
-  const handlePhoneChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value.replace(/\D/g, ''); // Remove non-digits
-    let formatted = input;
-    if (input.length > 0) {
-      formatted = `(${input.substring(0, 3)}`;
-    }
-    if (input.length > 3) {
-      formatted += `) ${input.substring(3, 6)}`;
-    }
-    if (input.length > 6) {
-      formatted += `-${input.substring(6, 10)}`;
-    }
-    setPhone(formatted);
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-
-    // Basic validation
-    if (phone.length < 14) {
-      alert('Please enter a valid phone number');
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      alert('Please enter a valid email address');
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      await fetch('https://services.leadconnectorhq.com/hooks/4PrBtcQb8wpAnA2gK9AJ/webhook-trigger/e64277fd-d5be-472c-8144-38fc1dd6f7ec', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName,
-          lastName,
-          email,
-          phone,
-          offer: offerTitle
-        }),
-      });
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      // Even if webhook fails, we still want to redirect the user to claim the offer
-    } finally {
-      setIsSubmitting(false);
-      navigate('/thank-you', { state: { firstName } });
-    }
-  };
-
+export default function Hero({ offer }: { offer: Offer }) {
   return (
-    <section id="hero" className="relative min-h-screen flex items-center pt-36 pb-12 overflow-hidden bg-[#F9F7F2]">
-      {/* Background Elements */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-[#BE0101]/5 -skew-x-12 transform origin-top-right z-0" />
-      <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-[#940101]/5 rounded-full blur-3xl z-0" />
+    <section id="top" className="relative overflow-hidden pt-5 pb-14 sm:pt-10 lg:pt-14 lg:pb-24">
+      {/* Citrus warmth behind the product, from the logo's yellow-to-red sweep */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-40 -right-40 size-[38rem] rounded-full bg-[radial-gradient(closest-side,rgba(255,217,61,0.35),rgba(247,148,29,0.12)_55%,transparent)] lg:-right-20 lg:top-0 lg:size-[52rem]"
+      />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-        {/* Text Content */}
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="space-y-6 lg:space-y-8 text-center lg:text-left"
-        >
-          <div className="inline-flex items-center space-x-2 bg-white border border-black/5 rounded-full px-4 py-2 shadow-sm mb-6">
-            <span className="flex items-center text-[#BE0101] font-bold text-xs uppercase tracking-wider">
-              <Star className="w-3 h-3 mr-1 fill-current" />
-              Fresh Blended Smoothies
-            </span>
-          </div>
-
-          {/* Social Proof */}
-          <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
-            <div className="flex -space-x-2">
-              {[
-                "https://i.pravatar.cc/100?img=5",
-                "https://i.pravatar.cc/100?img=9",
-                "https://i.pravatar.cc/100?img=12",
-                "https://i.pravatar.cc/100?img=24"
-              ].map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  alt="Happy Customer"
-                  className="w-8 h-8 rounded-full border-2 border-white"
-                />
+      <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-7 px-4 sm:px-6 lg:grid-cols-2 lg:items-stretch lg:gap-12 lg:px-8">
+        <div className="flex flex-col gap-2.5 sm:gap-4 lg:justify-center lg:gap-10">
+          <div className="flex flex-col gap-2.5 sm:gap-4 lg:gap-6">
+          <p className="flex items-center justify-center gap-2 text-[13px] font-semibold text-ink-700 lg:justify-start">
+            <span className="flex text-orange-500" aria-hidden>
+              {[0, 1, 2, 3, 4].map((i) => (
+                <Star key={i} className="size-4 fill-current" />
               ))}
-            </div>
-            <div className="flex flex-col">
-              <div className="flex text-yellow-400 gap-0.5">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <Star key={i} className="w-4 h-4 fill-current" />
-                ))}
-              </div>
-              <span className="text-xs font-bold text-gray-700">5.0 Stars from 1,550+ Reviews</span>
-            </div>
-          </div>
-
-          <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black leading-tight tracking-tight text-[#1A1A1A]">
-            {heroTitle}
-          </h1>
-
-          <p className="text-lg sm:text-xl text-gray-600 max-w-lg mx-auto lg:mx-0 font-medium leading-relaxed">
-            Handcrafted smoothies, fresh wraps, and acai bowls.
-            Blended with love, served with joy, and packed with natural energy.
+            </span>
+            {HERO_RATING_CLAIM}
           </p>
 
-          <div className="pt-4 flex flex-wrap items-center justify-center lg:justify-start gap-3 text-xs font-bold text-gray-500 uppercase tracking-wider">
-            <span className="flex items-center">
-              <span className="w-1.5 h-1.5 bg-[#940101] rounded-full mr-1.5"></span>
-              Fresh Fruit
-            </span>
-            <span className="flex items-center">
-              <span className="w-1.5 h-1.5 bg-[#BE0101] rounded-full mr-1.5"></span>
-              Natural Flavors
-            </span>
-            <span className="flex items-center">
-              <span className="w-1.5 h-1.5 bg-[#940101] rounded-full mr-1.5"></span>
-              Loved Locally
-            </span>
+          <Headline offer={offer} />
+
+          <p className="mx-auto max-w-[36ch] text-center text-[17px] leading-relaxed text-ink-700 sm:text-lg lg:mx-0 lg:text-left">{offer.subhead}</p>
+
           </div>
-        </motion.div>
 
-        {/* Form Content */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="relative"
-        >
-          <div id="claim-offer-form" className="bg-white p-8 rounded-[2rem] shadow-2xl border border-black/5 relative z-10">
-            <h2 className="text-3xl font-black text-[#1A1A1A] mb-2 uppercase tracking-tight text-center">
-              {offerTitle}
-            </h2>
-            <p className="text-gray-500 text-center mb-8 font-medium">
-              Fill out the form to get your coupon instantly!
-            </p>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="firstName" className="block text-sm font-bold text-gray-700 uppercase tracking-wide mb-1">First Name</label>
-                  <input
-                    type="text"
-                    id="firstName"
-                    required
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#BE0101] focus:border-transparent transition-all"
-                    placeholder="First"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="lastName" className="block text-sm font-bold text-gray-700 uppercase tracking-wide mb-1">Last Name</label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    required
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#BE0101] focus:border-transparent transition-all"
-                    placeholder="Last"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-bold text-gray-700 uppercase tracking-wide mb-1">Email</label>
-                <input
-                  type="email"
-                  id="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#BE0101] focus:border-transparent transition-all"
-                  placeholder="your@email.com"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="phone" className="block text-sm font-bold text-gray-700 uppercase tracking-wide mb-1">Phone</label>
-                <input
-                  type="tel"
-                  id="phone"
-                  required
-                  value={phone}
-                  onChange={handlePhoneChange}
-                  maxLength={14}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#BE0101] focus:border-transparent transition-all"
-                  placeholder="(555) 555-5555"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`w-full text-white font-bold py-4 rounded-xl shadow-lg transform transition-all duration-200 uppercase tracking-wider text-lg mt-4 ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#BE0101] hover:bg-[#940101] hover:shadow-xl hover:-translate-y-1'}`}
-              >
-                {isSubmitting ? 'Claiming...' : 'Claim Offer'}
-              </button>
-
-              <p className="text-[10px] text-gray-400 text-center leading-tight mt-4">
-                By clicking "Claim Offer", you agree to receive marketing text messages from Recharge Smoothies at the number provided, including messages sent by autodialer. Consent is not a condition of any purchase. Message and data rates may apply. Message frequency varies. Reply HELP for help or STOP to cancel. View our Privacy Policy and Terms of Service.
+          {/* Story card: desktop only. The whole left column is centered against the form card. */}
+          <div className="hidden items-center gap-5 rounded-[var(--radius-card)] bg-white p-5 shadow-[var(--shadow-card)] ring-1 ring-ink-900/5 lg:flex">
+            <img
+              src="/img/hero-lifestyle.webp"
+              alt="Smiling guest holding out a berry smoothie in a Recharge cup"
+              width={720}
+              height={901}
+              decoding="async"
+              className="aspect-[4/5] w-[112px] shrink-0 rounded-[16px] object-cover"
+            />
+            <div>
+              <p className="text-[15px] leading-relaxed text-ink-700">
+                Handcrafted smoothies, fresh wraps, and acai bowls. Blended with love, served with joy, and packed with
+                natural energy.
               </p>
-            </form>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {['Fresh Fruit', 'Natural Flavors'].map((t) => (
+                  <li
+                    key={t}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-[13px] font-semibold text-green-600"
+                  >
+                    <Check aria-hidden className="size-3.5" strokeWidth={3} />
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
+        </div>
 
-          {/* Decorative Elements behind form */}
-          <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#BE0101] rounded-full mix-blend-multiply opacity-20 animate-blob"></div>
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-[#940101] rounded-full mix-blend-multiply opacity-20 animate-blob animation-delay-2000"></div>
-        </motion.div>
+        <div
+          id="claim"
+          className="scroll-mt-24 rounded-[var(--radius-card)] bg-white p-5 shadow-[var(--shadow-card)] ring-1 ring-ink-900/5 sm:p-8"
+        >
+          <h2 className="mb-1 text-center font-sans text-[22px] lg:text-left font-bold leading-tight tracking-normal text-ink-900 sm:text-2xl lg:text-[32px]">
+            {offer.formTitle}
+          </h2>
+          <p className="mb-5 text-center text-[15px] text-ink-500 lg:mt-1 lg:mb-6 lg:text-left lg:text-[17px]">Takes about 20 seconds. No app needed.</p>
+          <LeadForm offer={offer} />
+        </div>
       </div>
     </section>
   );

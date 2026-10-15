@@ -1,59 +1,42 @@
 import { motion } from 'motion/react';
-import { ClipboardList, Store, Smile } from 'lucide-react';
+import type { Offer } from '../config';
 
-export default function HowItWorks() {
+export default function HowItWorks({ offer }: { offer: Offer }) {
   const steps = [
-    {
-      icon: ClipboardList,
-      title: "Claim Your Coupon",
-      description: "Fill out the quick form"
-    },
-    {
-      icon: Store,
-      title: "Visit Recharge Smoothies Cafe",
-      description: "Show your coupon at checkout."
-    },
-    {
-      icon: Smile,
-      title: "Enjoy Your Free Smoothie",
-      description: "Sip, savor, and smile!"
-    }
+    { title: 'Claim it here', body: 'Fill in the quick form and we send your coupon right away.' },
+    { title: 'Visit the cafe', body: 'Stop by 2101 N University Dr in Sunrise within 7 days.' },
+    { title: 'Show it at the counter', body: offer.enjoyStep },
   ];
 
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <h2 className="text-3xl sm:text-4xl font-black text-[#1A1A1A] mb-6 uppercase tracking-tight">
-            How It Works
-          </h2>
-          <p className="text-lg text-gray-600 font-medium leading-relaxed">
-            At Recharge Smoothies Cafe, we believe everyone deserves a taste of the best smoothies in Sunrise, Florida. This is our way of saying thank you to our community.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {steps.map((step, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
+    <section aria-labelledby="how-title" className="bg-[linear-gradient(135deg,var(--color-red-600),var(--color-red-800))] text-white">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+        <h2 id="how-title" className="text-4xl uppercase sm:text-5xl">
+          Three steps to your smoothie
+        </h2>
+        <ol className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-3 md:gap-6">
+          {steps.map((step, i) => (
+            <motion.li
+              key={step.title}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.2 }}
-              className="flex flex-col items-center text-center p-8 rounded-2xl bg-[#F9F7F2] border border-black/5 shadow-sm hover:shadow-md transition-shadow"
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+              className="flex gap-4 md:flex-col md:gap-3"
             >
-              <div className="w-20 h-20 bg-[#BE0101]/10 rounded-full flex items-center justify-center mb-6 text-[#BE0101]">
-                <step.icon className="w-10 h-10" />
+              <span
+                aria-hidden
+                className="font-display text-6xl leading-none text-yellow-400 tabular md:text-7xl"
+              >
+                {i + 1}
+              </span>
+              <div>
+                <h3 className="text-xl font-semibold">{step.title}</h3>
+                <p className="mt-1 max-w-[30ch] text-[16px] leading-relaxed text-white/85">{step.body}</p>
               </div>
-              <h3 className="text-xl font-bold text-[#1A1A1A] mb-3 uppercase tracking-wide">
-                {step.title}
-              </h3>
-              <p className="text-gray-600 font-medium text-lg">
-                {step.description}
-              </p>
-            </motion.div>
+            </motion.li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   );
