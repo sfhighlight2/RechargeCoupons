@@ -147,6 +147,32 @@ export default function LeadForm({ offer }: { offer: Offer }) {
     }
     markConverted();
     trackLead(eventId, offer.key);
+    // Fire-and-forget server-side CAPI event for dedup with the browser pixel.
+    // Never block navigation or surface errors; skip suspected bots.
+    if (!trap) {
+      try {
+        void fetch('/api/capi/lead', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            event_id: eventId,
+            offer_key: offer.key,
+            page_url: window.location.href,
+            email: payload.email,
+            phone_e164: payload.phone_e164,
+            firstName: payload.firstName,
+            lastName: payload.lastName,
+            fbp: (payload as any).fbp,
+            fbc: (payload as any).fbc,
+            user_agent: payload.user_agent,
+            possible_bot: payload.possible_bot,
+          }),
+          keepalive: true,
+        });
+      } catch {
+        // Fail silently by design
+      }
+    }
     navigate('/thank-you', {
       state: { firstName: payload.firstName, offerKey: offer.key, couponName: offer.couponName, from: window.location.pathname + window.location.search },
     });
